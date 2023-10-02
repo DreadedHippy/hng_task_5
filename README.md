@@ -32,7 +32,6 @@ To use this server, follow the instructions below:
 4. With all dependencies installed, run `npm start` to start the server.
 
 ### Sample API Request
-- Use [https://aizonhngtasks.azurewebsites.net/api](https://aizonhngtasks.azurewebsites.net/api) to make a sample API request on the HNG submitted task
 - Use [http://localhost:8080](http://localhost:8080) to make API requests on your locally hosted server.
 
 ### Notes
