@@ -6,7 +6,7 @@ import path from 'path';
 
 dotenv.config();
 
-const transcriptQueue = new Queue("transcript-queue", process.env.DEEPGRAM_API_KEY!);
+const transcriptQueue = new Queue("transcript-queue", process.env.REDIS_URL!);
 const deepgram = new Deepgram(process.env.DEEPGRAM_API_KEY!);
 
 export default transcriptQueue;

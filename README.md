@@ -25,6 +25,7 @@ To use this server, follow the instructions below:
 
 2. In your newly created `.env` file, fill in the necessary information.
 - DEEPGRAM_API_KEY: The api key for the deepgram transcription service
+- REDIS_URL: The url for your redis server
 
 3. With node installed, run `npm i` to install all required dependencies
 
