@@ -16,8 +16,8 @@ Response
 
 ### API Routes
 - upload un-subtitled video: POST (`/api`)
-- stream subtitled video: GET (`/api/name`)
-- download subtitled video: GET (`/api/download/name`)
+- stream ~~subtitled~~ un-subtitled  video: GET (`/api/:video`)
+- download ~~subtitled~~ un-subtitled video: GET (`/api/download/:video`)
 
 ### How to use
 To use this server, follow the instructions below:
