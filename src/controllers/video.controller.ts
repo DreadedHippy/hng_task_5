@@ -4,12 +4,13 @@ import fs from "fs";
 import { Deepgram } from "@deepgram/sdk";
 import path from "path";
 import { addSubtitles } from "../utils/subtitles";
+// import transcriptQueue from "../queue";
+import { addJobToQueue} from "../queue"
+import mime from 'mime';
 dotenv.config();
 
 
 export async function uploadVideo(req: Request, res: Response) {
-	console.log(Object.keys(req));
-
 	if (!req.file) {
 		res.status(400).json({
 			statue: false,
@@ -18,7 +19,7 @@ export async function uploadVideo(req: Request, res: Response) {
 		return
 	}
 
-	console.log(req.file.mimetype);
+	// console.log(req.file.mimetype);
 	
 	if (req.file?.mimetype.split("/")[0] !== "video") {
 		res.status(400).json({
@@ -28,13 +29,25 @@ export async function uploadVideo(req: Request, res: Response) {
 		return
 	}
 
-	// let relativeFilePath = "/uploads/" + req.file?.filename;
-	// let fileMimetype = req.file.mimetype;
+	res.status(200).json({
+		status: true,
+		message: "Video uploaded successfully",
+		data: {
+			videoDownloadLink: `http://localhost:8080/api/download/${req.file.filename}`,
+			videoStreamLink: `http://localhost:8080/api/${req.file.filename}`,
+		}
+	})
 
-	// const filePath = path.join(__dirname, "..", "..", relativeFilePath)
-	// let nameWithoutExt = path.parse(req.file.filename).name;
+	let relativeFilePath = "/uploads/" + req.file?.filename;
+	let fileMimetype = req.file.mimetype;
+
+	const filePath = path.join(__dirname, "..", "..", relativeFilePath)
+	let nameWithoutExt = path.parse(req.file.filename).name;
+
+	await addJobToQueue(filePath, fileMimetype);
 
 	// let deepgram = new Deepgram(process.env.DEEPGRAM_API_KEY!);
+
 	// const response = await deepgram.transcription.preRecorded(
 	// 	{
 	// 		stream: fs.createReadStream(filePath),
@@ -45,35 +58,21 @@ export async function uploadVideo(req: Request, res: Response) {
 
 	// fs.writeFile("uploads/" + nameWithoutExt + ".srt", response.toSRT(), (err) => {
 	// 	if(err) {
-	// 		res.status(500).json({
-	// 			statue: false,
-	// 			message: "An error occured on the server",
-	// 		})
-	// 	}		
-
-	// 	res.status(200).json({
-	// 		statue: true,
-	// 		message: "Video uploaded",
-	// 		data: {
-	// 			video: req.file?.filename
-	// 		}
-	// 	})
-		
+	// 		console.log ("Failed to transcribe file")
+	// 	}
 	// 	let subtitlePath = `./uploads/${nameWithoutExt}.srt`
 
-	// 	addSubtitles(filePath, req.file!.filename, subtitlePath, (err: boolean, newPath: string) => {
-	// 		console.log(err)
-	// 		console.log(newPath)
-	// 	});
+		
+	// 	console.log ("Failed transcribed sucessfully: " + subtitlePath);
 	// })
 }
 
 
 export async function streamVideo(req: Request, res: Response) {
 	let filename = req.params.video
-	let relativeFilePath = "/subbed/" + filename;
-
+	let relativeFilePath = "/uploads/" + filename;	
 	const filePath = path.join(__dirname, "..", "..", relativeFilePath)
+	let mimeType = mime.getType(filePath);
 
 	const exists = fs.existsSync(filePath);
 
@@ -99,7 +98,7 @@ export async function streamVideo(req: Request, res: Response) {
       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
       'Content-Length': chunkSize,
-      'Content-Type': 'video/mp4',
+      'Content-Type': `${mimeType}`,
     };
 
     res.writeHead(206, head);
@@ -107,7 +106,7 @@ export async function streamVideo(req: Request, res: Response) {
   } else {
     const head = {
       'Content-Length': fileSize,
-      'Content-Type': 'video/mp4',
+      'Content-Type': `${mimeType}`,
     };
 
     res.writeHead(200, head);
@@ -121,7 +120,7 @@ export async function streamVideo(req: Request, res: Response) {
 
 export async function downloadVideo(req: Request, res: Response) {
 	let video = req.params.video;
-	let relativeFilePath = "/subbed/" + video;
+	let relativeFilePath = "/uploads/" + video;
 	const filePath = path.join(__dirname, "..", "..", relativeFilePath)
 
 	const exists = fs.existsSync(filePath);
