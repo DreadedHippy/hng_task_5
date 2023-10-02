@@ -11,6 +11,7 @@ dotenv.config();
 
 
 export async function uploadVideo(req: Request, res: Response) {
+	// If no file, return error
 	if (!req.file) {
 		res.status(400).json({
 			statue: false,
@@ -18,9 +19,8 @@ export async function uploadVideo(req: Request, res: Response) {
 		})
 		return
 	}
-
-	// console.log(req.file.mimetype);
 	
+	// If file is not vide, return error
 	if (req.file?.mimetype.split("/")[0] !== "video") {
 		res.status(400).json({
 			statue: false,
@@ -29,6 +29,7 @@ export async function uploadVideo(req: Request, res: Response) {
 		return
 	}
 
+	// Return url to file
 	res.status(200).json({
 		status: true,
 		message: "Video uploaded successfully",
@@ -42,32 +43,11 @@ export async function uploadVideo(req: Request, res: Response) {
 	let fileMimetype = req.file.mimetype;
 
 	const filePath = path.join(__dirname, "..", "..", relativeFilePath)
-	let nameWithoutExt = path.parse(req.file.filename).name;
 
 	await addJobToQueue(filePath, fileMimetype);
-
-	// let deepgram = new Deepgram(process.env.DEEPGRAM_API_KEY!);
-
-	// const response = await deepgram.transcription.preRecorded(
-	// 	{
-	// 		stream: fs.createReadStream(filePath),
-	// 		mimetype: fileMimetype,
-	// 	},
-	// 	{punctuate: true, utterances: true}
-	// );
-
-	// fs.writeFile("uploads/" + nameWithoutExt + ".srt", response.toSRT(), (err) => {
-	// 	if(err) {
-	// 		console.log ("Failed to transcribe file")
-	// 	}
-	// 	let subtitlePath = `./uploads/${nameWithoutExt}.srt`
-
-		
-	// 	console.log ("Failed transcribed sucessfully: " + subtitlePath);
-	// })
 }
 
-
+// Stream video handler
 export async function streamVideo(req: Request, res: Response) {
 	let filename = req.params.video
 	let relativeFilePath = "/uploads/" + filename;	
@@ -76,6 +56,7 @@ export async function streamVideo(req: Request, res: Response) {
 
 	const exists = fs.existsSync(filePath);
 
+	// If file not found
 	if (!exists) {
 		res.status(400).json({
 			status: false,
@@ -83,10 +64,10 @@ export async function streamVideo(req: Request, res: Response) {
 		})
 	}
 
+	// Get file information
   const stat = fs.statSync(filePath);
   const fileSize = stat.size;
   const range = req.headers.range;
-	console.log(range)
 
   if (range) {
     const parts = range.replace(/bytes=/, '').split('-');
@@ -104,20 +85,20 @@ export async function streamVideo(req: Request, res: Response) {
     res.writeHead(206, head);
     file.pipe(res);
   } else {
-    const head = {
+    const head = { // Set header information
       'Content-Length': fileSize,
       'Content-Type': `${mimeType}`,
     };
 
     res.writeHead(200, head);
-    fs.createReadStream(filePath).pipe(res);
+    fs.createReadStream(filePath).pipe(res); // Stream video
   }
-
-  // res.download(filePath); // Set disposition and send it.
 
 	return	
 }
 
+
+// Download video handler
 export async function downloadVideo(req: Request, res: Response) {
 	let video = req.params.video;
 	let relativeFilePath = "/uploads/" + video;
@@ -125,17 +106,22 @@ export async function downloadVideo(req: Request, res: Response) {
 
 	const exists = fs.existsSync(filePath);
 
+	// If file does not exist, throw error
+
 	if (!exists) {
-		res.status(400).json({
+		res.status(404).json({
 			status: false,
 			message: "File not found"
 		})
 	}
 
+	// Else, download file
 	res.download(filePath);
 	
 }
 
+
+// Test endpoint
 export async function testBlob(req: Request, res: Response) {
 	console.log(req.file?.filename);
 	console.log("Endpoint reached");

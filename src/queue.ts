@@ -1,9 +1,13 @@
+import dotenv from 'dotenv';
 import fs from 'fs';
 import { Deepgram } from "@deepgram/sdk";
 import Queue from "bull";
 import path from 'path';
 
-const transcriptQueue = new Queue("transcript-queue", 'redis://127.0.0.1:6379');
+dotenv.config();
+
+const transcriptQueue = new Queue("transcript-queue", process.env.DEEPGRAM_API_KEY!);
+const deepgram = new Deepgram(process.env.DEEPGRAM_API_KEY!);
 
 export default transcriptQueue;
 
@@ -13,8 +17,8 @@ export async function addJobToQueue(filePath: string, fileMimetype: string) {
 
 }
 
+// The process for the transcript queue
 transcriptQueue.process( async (job, done) => {	
-	const deepgram = new Deepgram(process.env.DEEPGRAM_API_KEY!);
 	console.log(`Transcribing  ${JSON.stringify(job.data)} -- Job ${job.id}`);
 
 	const filePath = job.data.filePath,
