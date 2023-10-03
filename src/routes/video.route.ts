@@ -18,7 +18,6 @@ const upload = multer({ storage: storage })
 
 router.get("/:video", VideoController.streamVideo);
 router.get("/download/:video", cors(), VideoController.downloadVideo);
-router.post("/test", cors(), upload.single('file'), VideoController.testBlob);
 router.post("/", cors(), upload.single('file'), VideoController.uploadVideo);
 
 export default router;

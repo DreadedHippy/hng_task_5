@@ -79,7 +79,7 @@ export async function streamVideo(req: Request, res: Response) {
       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
       'Content-Length': chunkSize,
-      'Content-Type': `${mimeType}`,
+      'Content-Type': `video/mp4`,
     };
 
     res.writeHead(206, head);
@@ -87,7 +87,7 @@ export async function streamVideo(req: Request, res: Response) {
   } else {
     const head = { // Set header information
       'Content-Length': fileSize,
-      'Content-Type': `${mimeType}`,
+      'Content-Type': `video/mp4`,
     };
 
     res.writeHead(200, head);

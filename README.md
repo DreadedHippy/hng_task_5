@@ -15,9 +15,9 @@ Response
 - data: `object`, `array` -> not always present
 
 ### API Routes
-- upload un-subtitled video: POST (`/api`)
-- stream ~~subtitled~~ un-subtitled  video: GET (`/api/:video`)
-- download ~~subtitled~~ un-subtitled video: GET (`/api/download/:video`)
+- upload video: POST (`/api`)
+- stream video: GET (`/api/:video`)
+- download video: GET (`/api/download/:video`)
 
 ### How to use
 To use this server, follow the instructions below:
