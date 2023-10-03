@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import morgan from "morgan";
+import fs from "fs";
 // import personRoutes from "./routes/person.route";
 import videoRoutes from "./routes/video.route";
 import dotenv from "dotenv";
@@ -9,6 +10,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+const dir = "./uploads";
+
+if (!fs.existsSync(dir)){
+  fs.mkdirSync(dir);
+}
 
 // Necessary initializations
 app.use(cors());

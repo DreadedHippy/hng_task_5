@@ -10,7 +10,12 @@ import mime from 'mime';
 dotenv.config();
 
 
+const uploadPath = process.env.UPLOAD_PATH!;
+const port = process.env.PORT || 8080;
+
 export async function uploadVideo(req: Request, res: Response) {
+	let hostname = req.hostname == "localhost"? "http://localhost" + port : req.protocol + req.hostname
+	console.log(hostname);
 	// If no file, return error
 	if (!req.file) {
 		res.status(400).json({
@@ -34,15 +39,16 @@ export async function uploadVideo(req: Request, res: Response) {
 		status: true,
 		message: "Video uploaded successfully",
 		data: {
-			videoDownloadLink: `http://localhost:8080/api/download/${req.file.filename}`,
-			videoStreamLink: `http://localhost:8080/api/${req.file.filename}`,
+			videoDownloadLink: `${hostname}/api/download/${req.file.filename}`,
+			videoStreamLink: `${hostname}/api/${req.file.filename}`,
 		}
 	})
 
 	let relativeFilePath = "/uploads/" + req.file?.filename;
 	let fileMimetype = req.file.mimetype;
 
-	const filePath = path.join(__dirname, "..", "..", relativeFilePath)
+	const filePath = path.join(__dirname, "..", "..", relativeFilePath);
+	console.log("FILEEEEE", filePath);
 
 	await addJobToQueue(filePath, fileMimetype);
 }
@@ -50,7 +56,7 @@ export async function uploadVideo(req: Request, res: Response) {
 // Stream video handler
 export async function streamVideo(req: Request, res: Response) {
 	let filename = req.params.video
-	let relativeFilePath = "/uploads/" + filename;	
+	let relativeFilePath = uploadPath + filename;	
 	const filePath = path.join(__dirname, "..", "..", relativeFilePath)
 	let mimeType = mime.getType(filePath);
 
@@ -101,7 +107,7 @@ export async function streamVideo(req: Request, res: Response) {
 // Download video handler
 export async function downloadVideo(req: Request, res: Response) {
 	let video = req.params.video;
-	let relativeFilePath = "/uploads/" + video;
+	let relativeFilePath = uploadPath + video;
 	const filePath = path.join(__dirname, "..", "..", relativeFilePath)
 
 	const exists = fs.existsSync(filePath);

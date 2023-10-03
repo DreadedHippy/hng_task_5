@@ -4,9 +4,11 @@ import * as VideoController from "../controllers/video.controller";
 import multer from "multer";
 let router = Router();
 
+let uploadPath = process.env.UPLOAD_PATH!;
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads')
+    cb(null, uploadPath)
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname.split(" ").join(""))

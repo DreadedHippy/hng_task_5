@@ -6,9 +6,9 @@
   "types": "dist/server.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
-    "dev": "nodemon server.ts",
+    "dev": "cross-env UPLOAD_PATH=./uploads/ nodemon server.ts",
     "prestart": "npm run build",
-    "start": "node dist/server.js",
+    "start": "cross-env UPLOAD_PATH=./dist/uploads/ node dist/server.js",
     "build": "tsc"
   },
   "homepage": "https://github.com/DreadedHippy/hng_stage_2",
@@ -27,6 +27,7 @@
     "@types/multer": "^1.4.8",
     "@types/node": "^20.6.0",
     "@types/pg": "^8.10.2",
+    "cross-env": "^7.0.3",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2"
   },
